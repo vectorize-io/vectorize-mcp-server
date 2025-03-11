@@ -15,7 +15,8 @@ npx -y @vectorize-io/vectorize-mcp-server
 ```
 
 ## Configuration on Claude/Windsurf
-```
+
+```json
 {
   "mcpServers": {
     "vectorize": {
