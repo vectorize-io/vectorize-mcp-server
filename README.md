@@ -10,7 +10,7 @@ A Model Context Protocol (MCP) server implementation that integrates with [Vecto
 
 ```bash
 export VECTORIZE_ORG_ID=YOUR_ORG_ID
-export VECTORIZE_API_KEY=YOUR_API_KEY
+export VECTORIZE_TOKEN=YOUR_API_KEY
 npx -y @vectorize-io/vectorize-mcp-server
 ```
 
@@ -24,7 +24,7 @@ npx -y @vectorize-io/vectorize-mcp-server
       "args": ["-y", "@vectorize-io/vectorize-mcp-server"],
       "env": {
         "VECTORIZE_ORG_ID": "your-org-id",
-        "VECTORIZE_API_KEY": "your-api-key"
+        "VECTORIZE_TOKEN": "your-api-key"
       }
     }
   }
