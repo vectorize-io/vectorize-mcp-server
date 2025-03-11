@@ -9,15 +9,13 @@ import {
 } from '@modelcontextprotocol/sdk/types.js';
 
 import dotenv from 'dotenv';
-import { Configuration, PipelinesApi } from '@vectorize-io/vectorize-client';
+import { Configuration, ExtractionApi, FilesApi, PipelinesApi } from '@vectorize-io/vectorize-client';
 
 dotenv.config();
 
-// Tool definitions
 const RETRIEVAL_TOOL: Tool = {
-  name: 'vectorize_retrieve',
-  description:
-    "Retrieve documents from a Vectorize pipeline.",
+  name: 'retrieve',
+  description: 'Retrieve documents from a Vectorize pipeline.',
   inputSchema: {
     type: 'object',
     properties: {
@@ -25,8 +23,60 @@ const RETRIEVAL_TOOL: Tool = {
         type: 'string',
         description: 'The pipeline ID to retrieve documents from.',
       },
+      question: {
+        type: 'string',
+        description: 'The term to search for.',
+      },
+      k: {
+        type: 'number',
+        description: 'The number of documents to retrieve.',
+      },
     },
-    required: ['pipelineId'],
+    required: ['pipelineId', 'question', 'k'],
+  },
+};
+
+
+const DEEP_RESEARCH_TOOL: Tool = {
+  name: 'deep-research',
+  description: 'Generate a deep research on a Vectorize pipeline.',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      pipelineId: {
+        type: 'string',
+        description: 'The pipeline ID to retrieve documents from.',
+      },
+      query: {
+        type: 'string',
+        description: 'The deep research query.',
+      },
+      webSearch: {
+        type: 'boolean',
+        description: 'Whether to perform a web search.',
+      },
+    },
+    required: ['pipelineId', 'query', 'webSearch'],
+  },
+};
+
+const EXTRACTION_TOOL: Tool = {
+  name: 'extract',
+  description: 'Perform text extraction and chunking on a document.',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      base64Document: {
+        type: 'string',
+        description: 'Document encoded in base64.',
+      },
+      contentType: {
+        type: 'string',
+        description: 'Document content type.',
+      },
+
+    },
+    required: ['base64Document', 'contentType'],
   },
 };
 
@@ -34,7 +84,7 @@ const RETRIEVAL_TOOL: Tool = {
 const server = new Server(
   {
     name: 'vectorize-mcp',
-    version: '0.0.1',
+    version: '0.1.0',
   },
   {
     capabilities: {
@@ -47,11 +97,6 @@ const server = new Server(
 // Get optional API URL
 const VECTORIZE_ORG_ID = process.env.VECTORIZE_ORG_ID;
 const VECTORIZE_API_KEY = process.env.VECTORIZE_API_KEY;
-
-
-
-
-
 // Check if API key is required (only for cloud service)
 if (!VECTORIZE_ORG_ID || !VECTORIZE_API_KEY) {
   console.error(
@@ -60,18 +105,134 @@ if (!VECTORIZE_ORG_ID || !VECTORIZE_API_KEY) {
   process.exit(1);
 }
 const vectorizeApi = new Configuration({
-  accessToken: VECTORIZE_API_KEY
+  accessToken: VECTORIZE_API_KEY,
 });
 
-// Tool handlers
 server.setRequestHandler(ListToolsRequestSchema, async () => ({
-  tools: [
-    RETRIEVAL_TOOL,
-      ],
+  tools: [RETRIEVAL_TOOL, EXTRACTION_TOOL, DEEP_RESEARCH_TOOL],
 }));
 
+async function performRetrieval(
+  orgId: string,
+  pipelineId: string,
+  question: string,
+  k: number
+) {
+  const pipelinesApi = new PipelinesApi(vectorizeApi);
+  const response = await pipelinesApi.retrieveDocuments({
+    organization: orgId,
+    pipeline: pipelineId + '',
+    retrieveDocumentsRequest: {
+      question: question + '',
+      numResults: k,
+    },
+  });
+  return {
+    content: [{ type: 'text', text: JSON.stringify(response) }],
+    isError: false,
+  };
+}
+
+
+async function performExtraction(
+  orgId: string,
+  base64Document: string,
+  contentType: string
+) {
+  const filesApi = new FilesApi(vectorizeApi);
+  const startResponse = await filesApi.startFileUpload({
+    organization: orgId,
+    startFileUploadRequest: {
+      name: "My File",
+      contentType
+    }
+  });
+
+  const fileBuffer = Buffer.from(base64Document, 'base64');
+  const fetchResponse = await fetch(startResponse.uploadUrl, {
+    method: 'PUT',
+    body: fileBuffer,
+    headers: {
+      'Content-Type': contentType
+    },
+  });
+  if (!fetchResponse.ok) {
+    throw new Error(`Failed to upload file: ${fetchResponse.statusText}`);
+  }
+
+  const extractionApi = new ExtractionApi(vectorizeApi);
+  const response = await extractionApi.startExtraction({
+    organization: orgId,
+    startExtractionRequest: {
+      fileId: startResponse.fileId,
+      chunkSize: 512,
+    }
+  })
+  const extractionId = response.extractionId;
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
+    const result = await extractionApi.getExtractionResult({
+      organization: orgId,
+      extractionId: extractionId,
+    })
+    if (result.ready) {
+      if (result.data?.success) {
+        return {
+          content: [{ type: 'text', text: JSON.stringify(result.data) }],
+          isError: false,
+        }
+      } else {
+        throw new Error(`Extraction failed: ${result.data?.error}`);
+      }
+    } else {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    }
+  }
+}
+
+
+
+async function performDeepResearch(
+  orgId: string,
+  pipelineId: string,
+  query: string,
+  webSearch: boolean
+) {
+  const pipelinesApi = new PipelinesApi(vectorizeApi);
+  const response = await pipelinesApi.startDeepResearch({
+    organization: orgId,
+    pipeline: pipelineId,
+    startDeepResearchRequest: {
+      query,
+      webSearch
+    }
+  });
+  const researchId = response.researchId;
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
+    const result = await pipelinesApi.getDeepResearchResult({
+      organization: orgId,
+      pipeline: pipelineId,
+      researchId: researchId
+    })
+    if (result.ready) {
+      if (result.data?.success) {
+        return {
+          content: [{ type: 'text', text: result.data.markdown }],
+          isError: false,
+        }
+      } else {
+        throw new Error(`Deep research failed: ${result.data?.error}`);
+      }
+      break
+    } else {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    }
+  }
+}
+
+
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
-  const startTime = Date.now();
   try {
     const { name, arguments: args } = request.params;
 
@@ -86,42 +247,33 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     }
 
     switch (name) {
-      case 'vectorize_retrieve': {
-        const { pipelineId, question, k } = args;
-        try {
-          let pipelinesApi = new PipelinesApi(vectorizeApi);
-          let response = await pipelinesApi.retrieveDocuments({
-            organization: VECTORIZE_ORG_ID,
-            pipelineId: pipelineId + "",
-            retrieveDocumentsRequest: {
-              question: question + "",
-              numResults: Number(k)
-            }
-          });
-
-          return {
-            content: [
-              { type: 'text', text: JSON.stringify(response) },
-            ],
-            isError: false,
-          };
-        } catch (error) {
-          const errorMessage =
-            error instanceof Error ? error.message : String(error);
-          return {
-            content: [{ type: 'text', text: errorMessage }],
-            isError: true,
-          };
-        }
+      case 'retrieve': {
+        return await performRetrieval(
+          VECTORIZE_ORG_ID,
+          args.pipelineId + '',
+          args.question + '',
+          Number(args.k)
+        );
+      }
+      case 'extract': {
+        return await performExtraction(
+          VECTORIZE_ORG_ID,
+          args.base64Document + '',
+          args.contentType + ''
+        );
+      }
+      case 'deep-research': {
+        return await performDeepResearch(
+          VECTORIZE_ORG_ID,
+          args.pipelineId + '',
+          args.query + '',
+          Boolean(args.webSearch)
+        );
       }
       default:
-        return {
-          content: [{ type: 'text', text: `Unknown tool: ${name}` }],
-          isError: true,
-        };
+        throw new Error(`Tool not found: ${name}`);
     }
   } catch (error) {
-    // Log detailed error information
     server.sendLoggingMessage({
       level: 'error',
       data: {
@@ -131,57 +283,32 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         tool: request.params.name,
         arguments: request.params.arguments,
         timestamp: new Date().toISOString(),
-        duration: Date.now() - startTime,
       },
     });
-    return {
-      content: [
-        {
-          type: 'text',
-          text: `Error: ${
-            error instanceof Error ? error.message : String(error)
-          }`,
-        },
-      ],
-      isError: true,
-    };
-  } finally {
-    // Log request completion with performance metrics
-    server.sendLoggingMessage({
-      level: 'info',
-      data: `Request completed in ${Date.now() - startTime}ms`,
-    });
+    throw error;
   }
 });
 
 // Server startup
 async function runServer() {
-  try {
-    console.error('Initializing Vectorize MCP Server...');
+  const transport = new StdioServerTransport();
+  await server.connect(transport);
 
-    const transport = new StdioServerTransport();
-    await server.connect(transport);
+  // Now that we're connected, we can send logging messages
+  server.sendLoggingMessage({
+    level: 'info',
+    data: 'Vectorize MCP Server initialized successfully',
+  });
 
-    // Now that we're connected, we can send logging messages
-    server.sendLoggingMessage({
-      level: 'info',
-      data: 'Vectorize MCP Server initialized successfully',
-    });
+  server.sendLoggingMessage({
+    level: 'info',
+    data: `Configuration: Organization ID: ${VECTORIZE_ORG_ID || 'default'}`,
+  });
 
-    server.sendLoggingMessage({
-      level: 'info',
-      data: `Configuration: Organization ID: ${VECTORIZE_ORG_ID || 'default'}`,
-    });
-
-    console.error('FireCrawl MCP Server running on stdio');
-  } catch (error) {
-    console.error('Fatal error running server:', error);
-    process.exit(1);
-  }
+  console.error('Vectorize MCP Server running');
 }
 
 runServer().catch((error) => {
   console.error('Fatal error running server:', error);
   process.exit(1);
 });
-
