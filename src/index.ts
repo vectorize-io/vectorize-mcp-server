@@ -96,16 +96,16 @@ const server = new Server(
 
 // Get optional API URL
 const VECTORIZE_ORG_ID = process.env.VECTORIZE_ORG_ID;
-const VECTORIZE_API_KEY = process.env.VECTORIZE_API_KEY;
+const VECTORIZE_TOKEN = process.env.VECTORIZE_TOKEN;
 // Check if API key is required (only for cloud service)
-if (!VECTORIZE_ORG_ID || !VECTORIZE_API_KEY) {
+if (!VECTORIZE_ORG_ID || !VECTORIZE_TOKEN) {
   console.error(
-    'Error: VECTORIZE_API_KEY and VECTORIZE_ORG_ID environment variable are required'
+    'Error: VECTORIZE_TOKEN and VECTORIZE_ORG_ID environment variable are required'
   );
   process.exit(1);
 }
 const vectorizeApi = new Configuration({
-  accessToken: VECTORIZE_API_KEY,
+  accessToken: VECTORIZE_TOKEN,
 });
 
 server.setRequestHandler(ListToolsRequestSchema, async () => ({
