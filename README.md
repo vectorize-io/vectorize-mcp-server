@@ -2,6 +2,10 @@
 
 A Model Context Protocol (MCP) server implementation that integrates with [Vectorize](https://vectorize.io/) for advanced Vector retrieval and text extraction.
 
+<a href="https://glama.ai/mcp/servers/pxwbgk0kzr">
+  <img width="380" height="200" src="https://glama.ai/mcp/servers/pxwbgk0kzr/badge" alt="Vectorize MCP server" />
+</a>
+
 ## Features
 
 ## Installation
