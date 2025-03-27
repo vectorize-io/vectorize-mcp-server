@@ -20,7 +20,17 @@ export VECTORIZE_PIPELINE_ID=YOUR_PIPELINE_ID
 npx -y @vectorize-io/vectorize-mcp-server
 ```
 
-## Configuration on Claude/Windsurf
+## Environment Variables
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `VECTORIZE_ORG_ID` | Yes | Your Vectorize organization ID |
+| `VECTORIZE_TOKEN` | Yes | Your Vectorize API token |
+| `VECTORIZE_PIPELINE_ID` | No | Optional fixed pipeline ID to use for all requests |
+
+## Configuration Examples
+
+### Claude/Windsurf
 
 ```json
 {
@@ -31,7 +41,43 @@ npx -y @vectorize-io/vectorize-mcp-server
       "env": {
         "VECTORIZE_ORG_ID": "your-org-id",
         "VECTORIZE_TOKEN": "your-token",
-        "VECTORIZE_PIPELINE_ID": "your-pipeline-id" // Optional: Set a fixed pipeline ID
+        "VECTORIZE_PIPELINE_ID": "your-pipeline-id"
+      }
+    }
+  }
+}
+```
+
+### Cursor
+
+```json
+{
+  "mcpServers": {
+    "vectorize": {
+      "command": "npx",
+      "args": ["-y", "@vectorize-io/vectorize-mcp-server"],
+      "env": {
+        "VECTORIZE_ORG_ID": "your-org-id",
+        "VECTORIZE_TOKEN": "your-token",
+        "VECTORIZE_PIPELINE_ID": "your-pipeline-id"
+      }
+    }
+  }
+}
+```
+
+### Cline
+
+```json
+{
+  "mcpServers": {
+    "vectorize": {
+      "command": "npx",
+      "args": ["-y", "@vectorize-io/vectorize-mcp-server"],
+      "env": {
+        "VECTORIZE_ORG_ID": "your-org-id",
+        "VECTORIZE_TOKEN": "your-token",
+        "VECTORIZE_PIPELINE_ID": "your-pipeline-id"
       }
     }
   }
