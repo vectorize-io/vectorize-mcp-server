@@ -28,9 +28,7 @@ npx -y @vectorize-io/vectorize-mcp-server
 | `VECTORIZE_TOKEN` | Yes | Your Vectorize API token |
 | `VECTORIZE_PIPELINE_ID` | No | Optional fixed pipeline ID to use for all requests |
 
-## Configuration Examples
-
-### Claude/Windsurf
+## Configuration Example
 
 ```json
 {
@@ -48,41 +46,7 @@ npx -y @vectorize-io/vectorize-mcp-server
 }
 ```
 
-### Cursor
-
-```json
-{
-  "mcpServers": {
-    "vectorize": {
-      "command": "npx",
-      "args": ["-y", "@vectorize-io/vectorize-mcp-server"],
-      "env": {
-        "VECTORIZE_ORG_ID": "your-org-id",
-        "VECTORIZE_TOKEN": "your-token",
-        "VECTORIZE_PIPELINE_ID": "your-pipeline-id"
-      }
-    }
-  }
-}
-```
-
-### Cline
-
-```json
-{
-  "mcpServers": {
-    "vectorize": {
-      "command": "npx",
-      "args": ["-y", "@vectorize-io/vectorize-mcp-server"],
-      "env": {
-        "VECTORIZE_ORG_ID": "your-org-id",
-        "VECTORIZE_TOKEN": "your-token",
-        "VECTORIZE_PIPELINE_ID": "your-pipeline-id"
-      }
-    }
-  }
-}
-```
+This configuration works with Claude/Windsurf, Cursor, Cline, and other MCP-compatible clients.
 ## Tools
 
 ### Retrieve documents
