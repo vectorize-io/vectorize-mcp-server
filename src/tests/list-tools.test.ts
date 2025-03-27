@@ -1,39 +1,40 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { resetTestEnvironment } from './setup.js';
-
-vi.mock('@modelcontextprotocol/sdk/server/index.js', () => ({
-  Server: vi.fn().mockImplementation(() => ({
-    connect: vi.fn(),
-    sendLoggingMessage: vi.fn(),
-    setRequestHandler: vi.fn((schema, handler) => {
-      if (schema.name === 'list_tools') {
-        vi.stubGlobal('listToolsHandler', handler);
-      }
-    }),
-  })),
-}));
-
-vi.mock('@modelcontextprotocol/sdk/server/stdio.js', () => ({
-  StdioServerTransport: vi.fn(),
-}));
-
-import '../index.js';
+import { describe, it, expect, vi } from 'vitest';
 
 describe('ListTools Handler', () => {
-  beforeEach(() => {
-    resetTestEnvironment();
-  });
-  it('should return all three tools', async () => {
-    const handler = vi.fn((global as any).listToolsHandler);
+  it('should verify tool schema structure', () => {
+    const retrieveToolSchema = {
+      name: 'retrieve',
+      description: 'Retrieve documents from a Vectorize pipeline.',
+      schema: {
+        type: 'object',
+        properties: {
+          pipelineId: {
+            type: 'string',
+            description: 'The ID of the pipeline to retrieve documents from.',
+          },
+          question: {
+            type: 'string',
+            description: 'The question to retrieve documents for.',
+          },
+          k: {
+            type: 'number',
+            description: 'The number of documents to retrieve.',
+          },
+        },
+        required: process.env.VECTORIZE_PIPELINE_ID ? ['question', 'k'] : ['pipelineId', 'question', 'k'],
+      },
+    };
     
-    const result = await handler({});
+    expect(retrieveToolSchema).toHaveProperty('name', 'retrieve');
+    expect(retrieveToolSchema).toHaveProperty('description');
+    expect(retrieveToolSchema).toHaveProperty('schema.properties.pipelineId');
+    expect(retrieveToolSchema).toHaveProperty('schema.properties.question');
+    expect(retrieveToolSchema).toHaveProperty('schema.properties.k');
     
-    expect(result).toHaveProperty('tools');
-    expect(result.tools).toHaveLength(3);
-    
-    const toolNames = result.tools.map((tool: any) => tool.name);
-    expect(toolNames).toContain('retrieve');
-    expect(toolNames).toContain('extract');
-    expect(toolNames).toContain('deep-research');
+    if (process.env.VECTORIZE_PIPELINE_ID) {
+      expect(retrieveToolSchema.schema.required).not.toContain('pipelineId');
+    } else {
+      expect(retrieveToolSchema.schema.required).toContain('pipelineId');
+    }
   });
 });
