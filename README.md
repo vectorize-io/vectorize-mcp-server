@@ -15,9 +15,9 @@ A Model Context Protocol (MCP) server implementation that integrates with [Vecto
 ```bash
 export VECTORIZE_ORG_ID=YOUR_ORG_ID
 export VECTORIZE_TOKEN=YOUR_TOKEN
-# Optional: Set a fixed pipeline ID to use for all requests
 export VECTORIZE_PIPELINE_ID=YOUR_PIPELINE_ID
-npx -y @vectorize-io/vectorize-mcp-server
+
+npx -y @vectorize-io/vectorize-mcp-server@latest
 ```
 
 ## Configuration on Claude/Windsurf/Cursor/Cline
@@ -27,7 +27,7 @@ npx -y @vectorize-io/vectorize-mcp-server
   "mcpServers": {
     "vectorize": {
       "command": "npx",
-      "args": ["-y", "@vectorize-io/vectorize-mcp-server"],
+      "args": ["-y", "@vectorize-io/vectorize-mcp-server@latest"],
       "env": {
         "VECTORIZE_ORG_ID": "your-org-id",
         "VECTORIZE_TOKEN": "your-token",
@@ -47,7 +47,6 @@ Perform vector search and retrieve documents (see official [API](https://docs.ve
 {
   "name": "retrieve",
   "arguments": {
-    "pipeline": "your-pipeline-id",
     "question": "Financial health of the company",
     "k": 5
   }
@@ -76,7 +75,6 @@ Generate a Private Deep Research from your pipeline (see official [API](https://
 {
   "name": "deep-research",
   "arguments": {
-    "pipelineId": "your-pipeline-id",
     "query": "Generate a financial status report about the company",
     "webSearch": true
   }
