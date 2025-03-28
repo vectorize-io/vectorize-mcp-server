@@ -19,7 +19,6 @@ const RETRIEVAL_TOOL: Tool = {
   inputSchema: {
     type: 'object',
     properties: {
-
       question: {
         type: 'string',
         description: 'The term to search for.',
@@ -28,12 +27,8 @@ const RETRIEVAL_TOOL: Tool = {
         type: 'number',
         description: 'The number of documents to retrieve.',
       },
-      pipelineId: {
-        type: 'string',
-        description: 'The pipeline ID to retrieve documents from. If not specified explicitly, the value of VECTORIZE_PIPELINE_ID environment variable will be used.',
-      },
     },
-    required: process.env.VECTORIZE_PIPELINE_ID ? ['question', 'k'] : ['pipelineId', 'question', 'k'],
+    required: ['question', 'k']
   },
 };
 
@@ -44,10 +39,6 @@ const DEEP_RESEARCH_TOOL: Tool = {
   inputSchema: {
     type: 'object',
     properties: {
-      pipelineId: {
-        type: 'string',
-        description: 'The pipeline ID to retrieve documents from. If not specified explicitly, the value of VECTORIZE_PIPELINE_ID environment variable will be used.',
-      },
       query: {
         type: 'string',
         description: 'The deep research query.',
@@ -57,7 +48,7 @@ const DEEP_RESEARCH_TOOL: Tool = {
         description: 'Whether to perform a web search.',
       },
     },
-    required: process.env.VECTORIZE_PIPELINE_ID ? ['query', 'webSearch'] : ['pipelineId', 'query', 'webSearch'],
+    required: ['query', 'webSearch']
   },
 };
 
@@ -99,10 +90,9 @@ const server = new Server(
 const VECTORIZE_ORG_ID = process.env.VECTORIZE_ORG_ID;
 const VECTORIZE_TOKEN = process.env.VECTORIZE_TOKEN;
 const VECTORIZE_PIPELINE_ID = process.env.VECTORIZE_PIPELINE_ID;
-// Check if API key is required (only for cloud service)
-if (!VECTORIZE_ORG_ID || !VECTORIZE_TOKEN) {
+if (!VECTORIZE_ORG_ID || !VECTORIZE_TOKEN || !VECTORIZE_PIPELINE_ID) {
   console.error(
-    'Error: VECTORIZE_TOKEN and VECTORIZE_ORG_ID environment variable are required'
+    'Error: VECTORIZE_TOKEN and VECTORIZE_ORG_ID and VECTORIZE_PIPELINE_ID environment variable are required'
   );
   process.exit(1);
 }
@@ -252,7 +242,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       case 'retrieve': {
         return await performRetrieval(
           VECTORIZE_ORG_ID,
-          args.pipelineId ? (args.pipelineId + '') : (VECTORIZE_PIPELINE_ID || ''),
+          VECTORIZE_PIPELINE_ID,
           args.question + '',
           Number(args.k)
         );
@@ -267,7 +257,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       case 'deep-research': {
         return await performDeepResearch(
           VECTORIZE_ORG_ID,
-          args.pipelineId ? (args.pipelineId + '') : (VECTORIZE_PIPELINE_ID || ''),
+          VECTORIZE_PIPELINE_ID,
           args.query + '',
           Boolean(args.webSearch)
         );
@@ -304,17 +294,10 @@ async function runServer() {
 
   server.sendLoggingMessage({
     level: 'info',
-    data: `Configuration: Organization ID: ${VECTORIZE_ORG_ID || 'default'}`,
+    data: `Configuration: Organization ID: ${VECTORIZE_ORG_ID} with Pipeline ID: ${VECTORIZE_PIPELINE_ID}`,
   });
 
-  if (VECTORIZE_PIPELINE_ID) {
-    server.sendLoggingMessage({
-      level: 'info',
-      data: `Configuration: Using fixed Pipeline ID: ${VECTORIZE_PIPELINE_ID}`,
-    });
-  }
-
-  console.error('Vectorize MCP Server running');
+  console.info('Vectorize MCP Server running');
 }
 
 runServer().catch((error) => {
