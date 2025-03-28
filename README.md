@@ -85,12 +85,8 @@ Generate a Private Deep Research from your pipeline (see official [API](https://
 ## Development
 
 ```bash
-# Install dependencies
 npm install
-
-# Build
-npm run build
-
+npm run dev
 ```
 
 ### Contributing

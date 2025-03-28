@@ -19,10 +19,7 @@ const RETRIEVAL_TOOL: Tool = {
   inputSchema: {
     type: 'object',
     properties: {
-      pipelineId: {
-        type: 'string',
-        description: 'The pipeline ID to retrieve documents from.',
-      },
+
       question: {
         type: 'string',
         description: 'The term to search for.',
@@ -30,6 +27,10 @@ const RETRIEVAL_TOOL: Tool = {
       k: {
         type: 'number',
         description: 'The number of documents to retrieve.',
+      },
+      pipelineId: {
+        type: 'string',
+        description: 'The pipeline ID to retrieve documents from. If not specified explicitly, the value of VECTORIZE_PIPELINE_ID environment variable will be used.',
       },
     },
     required: process.env.VECTORIZE_PIPELINE_ID ? ['question', 'k'] : ['pipelineId', 'question', 'k'],
@@ -45,7 +46,7 @@ const DEEP_RESEARCH_TOOL: Tool = {
     properties: {
       pipelineId: {
         type: 'string',
-        description: 'The pipeline ID to retrieve documents from.',
+        description: 'The pipeline ID to retrieve documents from. If not specified explicitly, the value of VECTORIZE_PIPELINE_ID environment variable will be used.',
       },
       query: {
         type: 'string',
