@@ -31,7 +31,7 @@ const RETRIEVAL_TOOL: Tool = {
       k: {
         type: 'number',
         description: 'The number of documents to retrieve.',
-        default: 4
+        default: 4,
       },
     },
     required: ['question'],
