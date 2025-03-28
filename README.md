@@ -37,6 +37,7 @@ npx -y @vectorize-io/vectorize-mcp-server@latest
   }
 }
 ```
+
 ## Tools
 
 ### Retrieve documents
@@ -78,8 +79,9 @@ Generate a Private Deep Research from your pipeline (see official [API](https://
     "query": "Generate a financial status report about the company",
     "webSearch": true
   }
-} 
+}
 ```
+
 ## Development
 
 ```bash
