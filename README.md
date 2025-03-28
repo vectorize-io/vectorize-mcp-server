@@ -15,10 +15,12 @@ A Model Context Protocol (MCP) server implementation that integrates with [Vecto
 ```bash
 export VECTORIZE_ORG_ID=YOUR_ORG_ID
 export VECTORIZE_TOKEN=YOUR_TOKEN
+# Optional: Set a fixed pipeline ID to use for all requests
+export VECTORIZE_PIPELINE_ID=YOUR_PIPELINE_ID
 npx -y @vectorize-io/vectorize-mcp-server
 ```
 
-## Configuration on Claude/Windsurf
+## Configuration on Claude/Windsurf/Cursor/Cline
 
 ```json
 {
@@ -28,7 +30,8 @@ npx -y @vectorize-io/vectorize-mcp-server
       "args": ["-y", "@vectorize-io/vectorize-mcp-server"],
       "env": {
         "VECTORIZE_ORG_ID": "your-org-id",
-        "VECTORIZE_TOKEN": "your-token"
+        "VECTORIZE_TOKEN": "your-token",
+        "VECTORIZE_PIPELINE_ID": "your-pipeline-id"
       }
     }
   }

@@ -32,7 +32,7 @@ const RETRIEVAL_TOOL: Tool = {
         description: 'The number of documents to retrieve.',
       },
     },
-    required: ['pipelineId', 'question', 'k'],
+    required: process.env.VECTORIZE_PIPELINE_ID ? ['question', 'k'] : ['pipelineId', 'question', 'k'],
   },
 };
 
@@ -56,7 +56,7 @@ const DEEP_RESEARCH_TOOL: Tool = {
         description: 'Whether to perform a web search.',
       },
     },
-    required: ['pipelineId', 'query', 'webSearch'],
+    required: process.env.VECTORIZE_PIPELINE_ID ? ['query', 'webSearch'] : ['pipelineId', 'query', 'webSearch'],
   },
 };
 
@@ -97,6 +97,7 @@ const server = new Server(
 // Get optional API URL
 const VECTORIZE_ORG_ID = process.env.VECTORIZE_ORG_ID;
 const VECTORIZE_TOKEN = process.env.VECTORIZE_TOKEN;
+const VECTORIZE_PIPELINE_ID = process.env.VECTORIZE_PIPELINE_ID;
 // Check if API key is required (only for cloud service)
 if (!VECTORIZE_ORG_ID || !VECTORIZE_TOKEN) {
   console.error(
@@ -250,7 +251,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       case 'retrieve': {
         return await performRetrieval(
           VECTORIZE_ORG_ID,
-          args.pipelineId + '',
+          args.pipelineId ? (args.pipelineId + '') : (VECTORIZE_PIPELINE_ID || ''),
           args.question + '',
           Number(args.k)
         );
@@ -265,7 +266,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       case 'deep-research': {
         return await performDeepResearch(
           VECTORIZE_ORG_ID,
-          args.pipelineId + '',
+          args.pipelineId ? (args.pipelineId + '') : (VECTORIZE_PIPELINE_ID || ''),
           args.query + '',
           Boolean(args.webSearch)
         );
@@ -304,6 +305,13 @@ async function runServer() {
     level: 'info',
     data: `Configuration: Organization ID: ${VECTORIZE_ORG_ID || 'default'}`,
   });
+
+  if (VECTORIZE_PIPELINE_ID) {
+    server.sendLoggingMessage({
+      level: 'info',
+      data: `Configuration: Using fixed Pipeline ID: ${VECTORIZE_PIPELINE_ID}`,
+    });
+  }
 
   console.error('Vectorize MCP Server running');
 }
