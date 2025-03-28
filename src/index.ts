@@ -244,7 +244,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           VECTORIZE_ORG_ID,
           VECTORIZE_PIPELINE_ID,
           args.question + '',
-          Number(args.k)
+          Number(args.k || 4)
         );
       }
       case 'extract': {
@@ -266,18 +266,22 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         throw new Error(`Tool not found: ${name}`);
     }
   } catch (error) {
+    const errorMessage = `Request failed: ${
+      error instanceof Error ? error.message : String(error)
+    }`;
     server.sendLoggingMessage({
       level: 'error',
       data: {
-        message: `Request failed: ${
-          error instanceof Error ? error.message : String(error)
-        }`,
+        message: errorMessage,
         tool: request.params.name,
         arguments: request.params.arguments,
         timestamp: new Date().toISOString(),
       },
     });
-    throw error;
+    return {
+      content: [{ type: 'text', text: JSON.stringify({ error: errorMessage }) }],
+      isError: true,
+    };
   }
 });
 
