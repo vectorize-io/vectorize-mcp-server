@@ -9,13 +9,18 @@ import {
 } from '@modelcontextprotocol/sdk/types.js';
 
 import dotenv from 'dotenv';
-import { Configuration, ExtractionApi, FilesApi, PipelinesApi } from '@vectorize-io/vectorize-client';
+import {
+  Configuration,
+  ExtractionApi,
+  FilesApi,
+  PipelinesApi,
+} from '@vectorize-io/vectorize-client';
 
 dotenv.config();
 
 const RETRIEVAL_TOOL: Tool = {
   name: 'retrieve',
-  description: 'Retrieve documents from a Vectorize pipeline.',
+  description: 'Retrieve documents from the configured pipeline.',
   inputSchema: {
     type: 'object',
     properties: {
@@ -26,16 +31,16 @@ const RETRIEVAL_TOOL: Tool = {
       k: {
         type: 'number',
         description: 'The number of documents to retrieve.',
+        default: 4
       },
     },
-    required: ['question', 'k']
+    required: ['question'],
   },
 };
 
-
 const DEEP_RESEARCH_TOOL: Tool = {
   name: 'deep-research',
-  description: 'Generate a deep research on a Vectorize pipeline.',
+  description: 'Generate a deep research on the configured pipeline.',
   inputSchema: {
     type: 'object',
     properties: {
@@ -48,7 +53,7 @@ const DEEP_RESEARCH_TOOL: Tool = {
         description: 'Whether to perform a web search.',
       },
     },
-    required: ['query', 'webSearch']
+    required: ['query', 'webSearch'],
   },
 };
 
@@ -66,7 +71,6 @@ const EXTRACTION_TOOL: Tool = {
         type: 'string',
         description: 'Document content type.',
       },
-
     },
     required: ['base64Document', 'contentType'],
   },
@@ -125,7 +129,6 @@ async function performRetrieval(
   };
 }
 
-
 async function performExtraction(
   orgId: string,
   base64Document: string,
@@ -135,9 +138,9 @@ async function performExtraction(
   const startResponse = await filesApi.startFileUpload({
     organization: orgId,
     startFileUploadRequest: {
-      name: "My File",
-      contentType
-    }
+      name: 'My File',
+      contentType,
+    },
   });
 
   const fileBuffer = Buffer.from(base64Document, 'base64');
@@ -145,7 +148,7 @@ async function performExtraction(
     method: 'PUT',
     body: fileBuffer,
     headers: {
-      'Content-Type': contentType
+      'Content-Type': contentType,
     },
   });
   if (!fetchResponse.ok) {
@@ -158,21 +161,21 @@ async function performExtraction(
     startExtractionRequest: {
       fileId: startResponse.fileId,
       chunkSize: 512,
-    }
-  })
+    },
+  });
   const extractionId = response.extractionId;
   // eslint-disable-next-line no-constant-condition
   while (true) {
     const result = await extractionApi.getExtractionResult({
       organization: orgId,
       extractionId: extractionId,
-    })
+    });
     if (result.ready) {
       if (result.data?.success) {
         return {
           content: [{ type: 'text', text: JSON.stringify(result.data) }],
           isError: false,
-        }
+        };
       } else {
         throw new Error(`Extraction failed: ${result.data?.error}`);
       }
@@ -181,8 +184,6 @@ async function performExtraction(
     }
   }
 }
-
-
 
 async function performDeepResearch(
   orgId: string,
@@ -196,8 +197,8 @@ async function performDeepResearch(
     pipeline: pipelineId,
     startDeepResearchRequest: {
       query,
-      webSearch
-    }
+      webSearch,
+    },
   });
   const researchId = response.researchId;
   // eslint-disable-next-line no-constant-condition
@@ -205,24 +206,23 @@ async function performDeepResearch(
     const result = await pipelinesApi.getDeepResearchResult({
       organization: orgId,
       pipeline: pipelineId,
-      researchId: researchId
-    })
+      researchId: researchId,
+    });
     if (result.ready) {
       if (result.data?.success) {
         return {
           content: [{ type: 'text', text: result.data.markdown }],
           isError: false,
-        }
+        };
       } else {
         throw new Error(`Deep research failed: ${result.data?.error}`);
       }
-      break
+      break;
     } else {
       await new Promise((resolve) => setTimeout(resolve, 1000));
     }
   }
 }
-
 
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
   try {
@@ -279,7 +279,9 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       },
     });
     return {
-      content: [{ type: 'text', text: JSON.stringify({ error: errorMessage }) }],
+      content: [
+        { type: 'text', text: JSON.stringify({ error: errorMessage }) },
+      ],
       isError: true,
     };
   }
@@ -300,8 +302,6 @@ async function runServer() {
     level: 'info',
     data: `Configuration: Organization ID: ${VECTORIZE_ORG_ID} with Pipeline ID: ${VECTORIZE_PIPELINE_ID}`,
   });
-
-  console.info('Vectorize MCP Server running');
 }
 
 runServer().catch((error) => {
