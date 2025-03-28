@@ -20,7 +20,7 @@ export VECTORIZE_PIPELINE_ID=YOUR_PIPELINE_ID
 npx -y @vectorize-io/vectorize-mcp-server
 ```
 
-## Configuration on Claude/Windsurf
+## Configuration on Claude/Windsurf/Cursor/Cline
 
 ```json
 {
@@ -31,7 +31,7 @@ npx -y @vectorize-io/vectorize-mcp-server
       "env": {
         "VECTORIZE_ORG_ID": "your-org-id",
         "VECTORIZE_TOKEN": "your-token",
-        "VECTORIZE_PIPELINE_ID": "your-pipeline-id" // Optional: Set a fixed pipeline ID
+        "VECTORIZE_PIPELINE_ID": "your-pipeline-id"
       }
     }
   }
