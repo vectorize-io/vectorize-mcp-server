@@ -6,11 +6,6 @@ A Model Context Protocol (MCP) server implementation that integrates with [Vecto
   <img width="380" height="200" src="https://glama.ai/mcp/servers/pxwbgk0kzr/badge" alt="Vectorize MCP server" />
 </a>
 
-## Usage
-![mcp5](https://github.com/user-attachments/assets/faa41b4b-6985-4f41-985e-eafb139e6f00)
-
-
-
 
 ## Installation
 
