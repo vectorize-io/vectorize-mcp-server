@@ -19,6 +19,90 @@ export VECTORIZE_PIPELINE_ID=YOUR_PIPELINE_ID
 npx -y @vectorize-io/vectorize-mcp-server@latest
 ```
 
+### VS Code Installation
+
+For one-click installation, click one of the install buttons below:
+
+[![Install with NPX in VS Code](https://img.shields.io/badge/VS_Code-NPM-0098FF?style=flat-square&logo=visualstudiocode&logoColor=white)](https://insiders.vscode.dev/redirect/mcp/install?name=vectorize&config=%7B%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22%40vectorize-io%2Fvectorize-mcp-server%40latest%22%5D%2C%22env%22%3A%7B%22VECTORIZE_ORG_ID%22%3A%22%24%7Binput%3Aorg_id%7D%22%2C%22VECTORIZE_TOKEN%22%3A%22%24%7Binput%3Atoken%7D%22%2C%22VECTORIZE_PIPELINE_ID%22%3A%22%24%7Binput%3Apipeline_id%7D%22%7D%7D&inputs=%5B%7B%22type%22%3A%22promptString%22%2C%22id%22%3A%22org_id%22%2C%22description%22%3A%22Vectorize+Organization+ID%22%7D%2C%7B%22type%22%3A%22promptString%22%2C%22id%22%3A%22token%22%2C%22description%22%3A%22Vectorize+Token%22%2C%22password%22%3Atrue%7D%2C%7B%22type%22%3A%22promptString%22%2C%22id%22%3A%22pipeline_id%22%2C%22description%22%3A%22Vectorize+Pipeline+ID%22%7D%5D) [![Install with NPX in VS Code Insiders](https://img.shields.io/badge/VS_Code_Insiders-NPM-24bfa5?style=flat-square&logo=visualstudiocode&logoColor=white)](https://insiders.vscode.dev/redirect/mcp/install?name=vectorize&config=%7B%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22%40vectorize-io%2Fvectorize-mcp-server%40latest%22%5D%2C%22env%22%3A%7B%22VECTORIZE_ORG_ID%22%3A%22%24%7Binput%3Aorg_id%7D%22%2C%22VECTORIZE_TOKEN%22%3A%22%24%7Binput%3Atoken%7D%22%2C%22VECTORIZE_PIPELINE_ID%22%3A%22%24%7Binput%3Apipeline_id%7D%22%7D%7D&inputs=%5B%7B%22type%22%3A%22promptString%22%2C%22id%22%3A%22org_id%22%2C%22description%22%3A%22Vectorize+Organization+ID%22%7D%2C%7B%22type%22%3A%22promptString%22%2C%22id%22%3A%22token%22%2C%22description%22%3A%22Vectorize+Token%22%2C%22password%22%3Atrue%7D%2C%7B%22type%22%3A%22promptString%22%2C%22id%22%3A%22pipeline_id%22%2C%22description%22%3A%22Vectorize+Pipeline+ID%22%7D%5D&quality=insiders)
+
+### Manual Installation
+
+For the quickest installation, use the one-click install buttons at the top of this section.
+
+To install manually, add the following JSON block to your User Settings (JSON) file in VS Code. You can do this by pressing `Ctrl + Shift + P` and typing `Preferences: Open User Settings (JSON)`.
+
+```json
+{
+  "mcp": {
+    "inputs": [
+      {
+        "type": "promptString",
+        "id": "org_id",
+        "description": "Vectorize Organization ID"
+      },
+      {
+        "type": "promptString",
+        "id": "token",
+        "description": "Vectorize Token",
+        "password": true
+      },
+      {
+        "type": "promptString",
+        "id": "pipeline_id",
+        "description": "Vectorize Pipeline ID"
+      }
+    ],
+    "servers": {
+      "vectorize": {
+        "command": "npx",
+        "args": ["-y", "@vectorize-io/vectorize-mcp-server@latest"],
+        "env": {
+          "VECTORIZE_ORG_ID": "${input:org_id}",
+          "VECTORIZE_TOKEN": "${input:token}",
+          "VECTORIZE_PIPELINE_ID": "${input:pipeline_id}"
+        }
+      }
+    }
+  }
+}
+```
+
+Optionally, you can add the following to a file called `.vscode/mcp.json` in your workspace to share the configuration with others:
+
+```json
+{
+  "inputs": [
+    {
+      "type": "promptString",
+      "id": "org_id",
+      "description": "Vectorize Organization ID"
+    },
+    {
+      "type": "promptString",
+      "id": "token",
+      "description": "Vectorize Token",
+      "password": true
+    },
+    {
+      "type": "promptString",
+      "id": "pipeline_id",
+      "description": "Vectorize Pipeline ID"
+    }
+  ],
+  "servers": {
+    "vectorize": {
+      "command": "npx",
+      "args": ["-y", "@vectorize-io/vectorize-mcp-server@latest"],
+      "env": {
+        "VECTORIZE_ORG_ID": "${input:org_id}",
+        "VECTORIZE_TOKEN": "${input:token}",
+        "VECTORIZE_PIPELINE_ID": "${input:pipeline_id}"
+      }
+    }
+  }
+}
+```
+
 ## Configuration on Claude/Windsurf/Cursor/Cline
 
 ```json
