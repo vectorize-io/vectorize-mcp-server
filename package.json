@@ -19,7 +19,7 @@
     "lint:fix": "eslint src/**/*.ts --fix",
     "format": "prettier --write .",
     "prepare": "npm run build",
-    "publish": "npm run build && npm publish"
+    "release": "npm run build && npm publish"
   },
   "license": "ISC",
   "dependencies": {
