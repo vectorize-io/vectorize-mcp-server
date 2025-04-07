@@ -172,8 +172,18 @@ npm install
 npm run dev
 ```
 
+### Release
+Change the package.json version and then:
+```bash
+git commit -am "x.y.z"
+git tag x.y.z
+git push origin
+git push origin --tags
+```
+
 ### Contributing
 
 1. Fork the repository
 2. Create your feature branch
 3. Submit a pull request
+
