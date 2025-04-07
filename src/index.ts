@@ -201,6 +201,10 @@ async function performDeepResearch(
     },
   });
   const researchId = response.researchId;
+    server.sendLoggingMessage({
+      level: 'info',
+      data: `[${new Date().toISOString()}] Started deep research with ID: ${researchId}`,
+    });
   // eslint-disable-next-line no-constant-condition
   while (true) {
     const result = await pipelinesApi.getDeepResearchResult({
@@ -265,10 +269,19 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       default:
         throw new Error(`Tool not found: ${name}`);
     }
-  } catch (error) {
-    const errorMessage = `Request failed: ${
-      error instanceof Error ? error.message : String(error)
-    }`;
+  } catch (error: any) {
+    let errorMessage;
+    if (error?.response) {
+      console.error('Error response:', error.response);
+      try {
+        errorMessage = await error.response.text()
+        errorMessage = `Server request failed with ${error.response?.status}: ${errorMessage}`;
+      } catch (e: any) {
+        // ignore
+      }
+    }
+    errorMessage = errorMessage || (error instanceof Error ? error.message : String(error))
+    errorMessage = `Request failed: ${errorMessage}`;
     server.sendLoggingMessage({
       level: 'error',
       data: {
