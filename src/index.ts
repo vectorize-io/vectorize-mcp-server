@@ -96,7 +96,7 @@ const VECTORIZE_TOKEN = process.env.VECTORIZE_TOKEN;
 const VECTORIZE_PIPELINE_ID = process.env.VECTORIZE_PIPELINE_ID;
 if (!VECTORIZE_ORG_ID || !VECTORIZE_TOKEN || !VECTORIZE_PIPELINE_ID) {
   console.error(
-    'Error: VECTORIZE_TOKEN and VECTORIZE_ORG_ID and VECTORIZE_PIPELINE_ID environment variable are required'
+    'Error: VECTORIZE_TOKEN and VECTORIZE_ORG_ID and VECTORIZE_PIPELINE_ID environment variables are required'
   );
   process.exit(1);
 }
