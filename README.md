@@ -103,6 +103,10 @@ Optionally, you can add the following to a file called `.vscode/mcp.json` in you
 }
 ```
 
+## Hosted deployment
+
+A hosted deployment is available on [Fronteir AI](https://fronteir.ai/mcp/vectorize-io-vectorize-mcp-server).
+
 ## Configuration on Claude/Windsurf/Cursor/Cline
 
 ```json
