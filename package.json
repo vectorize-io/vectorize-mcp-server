@@ -23,7 +23,7 @@
   },
   "license": "ISC",
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.4.1",
+    "@modelcontextprotocol/sdk": "^1.29.0",
     "@vectorize-io/vectorize-client": "^0.1.3",
     "dotenv": "^16.4.7",
     "p-queue": "^8.0.1",
