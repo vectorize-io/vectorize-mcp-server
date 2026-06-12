@@ -22,6 +22,9 @@
     "release": "npm run build && npm publish"
   },
   "license": "ISC",
+  "overrides": {
+    "ip-address": "10.1.1"
+  },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",
     "@vectorize-io/vectorize-client": "^0.1.3",
