@@ -23,7 +23,14 @@
   },
   "license": "ISC",
   "overrides": {
-    "ip-address": "10.1.1"
+    "brace-expansion@^1.1.0": "1.1.18",
+    "brace-expansion@^2.0.0": "2.1.4",
+    "@hono/node-server": "1.19.15",
+    "body-parser": "2.3.0",
+    "fast-uri": "3.1.5",
+    "hono": "4.12.34",
+    "ip-address": "10.3.1",
+    "js-yaml": "4.3.1"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",
