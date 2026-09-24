@@ -1,3 +1,5 @@
+[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/vectorize-io-vectorize-mcp-server-badge.png)](https://mseep.ai/app/vectorize-io-vectorize-mcp-server)
+
 # Vectorize MCP Server
 
 A Model Context Protocol (MCP) server implementation that integrates with [Vectorize](https://vectorize.io/) for advanced Vector retrieval and text extraction.
